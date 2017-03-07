@@ -16,6 +16,14 @@ interface ICell {
   draw(): string;
 }
 
+interface IDown {
+  getDown(): number;
+}
+
+interface IAcross {
+  getAcross(): number;
+}
+
 class EmptyCell implements ICell {
   toString() {
     return "EmptyCell";
@@ -79,11 +87,11 @@ class ValueCell implements ICell {
   }
 }
 
-class DownAcrossCell implements ICell {
+class DownAcrossCell implements ICell, IDown, IAcross {
   down: number;
   across: number;
 
-  constructor(down, across) {
+  constructor(down: number, across: number) {
     this.down = down;
     this.across = across;
   }
@@ -115,12 +123,13 @@ class DownAcrossCell implements ICell {
 
   draw() {
     return "   " + pad2(this.down) + "\\" + pad2(this.across) + "  ";
-  }}
+  }
+}
 
-class DownCell implements ICell {
+class DownCell implements ICell, IDown {
   down: number;
 
-  constructor(down) {
+  constructor(down: number) {
     this.down = down;
   }
 
@@ -150,10 +159,10 @@ class DownCell implements ICell {
   }
 }
 
-class AcrossCell implements ICell {
+class AcrossCell implements ICell, IAcross {
   across: number;
 
-  constructor(across) {
+  constructor(across: number) {
     this.across = across;
   }
 
@@ -200,11 +209,11 @@ const v = function() {
 
 const e = () => new EmptyCell();
 
-const da = (down, across) => new DownAcrossCell(down, across);
+const da = (down: number, across: number) => new DownAcrossCell(down, across);
 
-const d = down => new DownCell(down);
+const d = (down: number) => new DownCell(down);
 
-const a = across => new AcrossCell(across);
+const a = (across: number) => new AcrossCell(across);
 
 const flatten = arrays => Array.prototype.concat.apply([], arrays);
 
@@ -311,9 +320,9 @@ const solvePair = (f, pair) => {
 
 const solveLine = (line, f): ICell[] => flatten(pairTargetsWithValues(line).map(pair => solvePair(f, pair)));
 
-const solveRow = row => solveLine(row, x => x.getAcross());
+const solveRow = row => solveLine(row, (x: IAcross) => x.getAcross());
 
-const solveColumn = column => solveLine(column, x => x.getDown());
+const solveColumn = column => solveLine(column, (x: IDown) => x.getDown());
 
 function solveGrid(grid: ICell[][]): ICell[][] {
   const rowsDone = grid.map(solveRow);
