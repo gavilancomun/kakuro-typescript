@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
     "module": "system",
+    "alwaysStrict": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "outFile": "target/tsc.js",
-    "sourceMap": true
+    "outFile": "target/kakuro.js",
+    "sourceMap": true,
+    "target": "ES2016"
   },
   "include": [
     "src/**/*"
@@ -13,8 +15,7 @@
     "exclude": [
       "node_modules",
       "**/*.spec.ts",
-      "src/**/greeter.ts",
-      "src/**/greeter2.ts"
+      "src/**/greeter*.ts"
     ]
 }
 
