@@ -12,7 +12,11 @@ const pad2 = n => {
   return (s.length < 2) ? (" " + s) : s;
 };
 
-class EmptyCell {
+interface ICell {
+  draw(): string;
+}
+
+class EmptyCell implements ICell {
   toString() {
     return "EmptyCell";
   }
@@ -32,9 +36,11 @@ class EmptyCell {
   }
 }
 
-class ValueCell {
+class ValueCell implements ICell {
+  values: {}[];
+
   constructor(values) {
-    this.values = Array.of(...new Set(values));
+    this.values = Array.from(new Set(values));
   }
 
   toString() {
@@ -73,7 +79,10 @@ class ValueCell {
   }
 }
 
-class DownAcrossCell {
+class DownAcrossCell implements ICell {
+  down: number;
+  across: number;
+
   constructor(down, across) {
     this.down = down;
     this.across = across;
@@ -108,7 +117,9 @@ class DownAcrossCell {
     return "   " + pad2(this.down) + "\\" + pad2(this.across) + "  ";
   }}
 
-class DownCell {
+class DownCell implements ICell {
+  down: number;
+
   constructor(down) {
     this.down = down;
   }
@@ -139,7 +150,9 @@ class DownCell {
   }
 }
 
-class AcrossCell {
+class AcrossCell implements ICell {
+  across: number;
+
   constructor(across) {
     this.across = across;
   }
@@ -220,7 +233,7 @@ const permuteAll = (vs, target) => permute(vs, target, []);
 
 const isPossible = (v, n) => v.values.includes(n);
 
-const range = n => Array(n).fill().map((x, i) => i);
+const range = n => new Array(n).fill(0).map((x, i) => i);
 
 const transpose = m => (0 === m.length) ? [] : range(m[0].length).map(i => m.map(col => col[i]));
 
