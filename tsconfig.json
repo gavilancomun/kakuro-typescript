@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "system",
     "alwaysStrict": true,
+    "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "outFile": "target/kakuro.js",

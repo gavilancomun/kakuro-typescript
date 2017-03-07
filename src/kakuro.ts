@@ -5,9 +5,9 @@
 
 const arrEquals = (a1, a2) => JSON.stringify(a1) === JSON.stringify(a2);
 
-const contains = (coll, item) => coll.indexOf(item) > -1;
+const contains = (coll: {}[], item) => coll.indexOf(item) > -1;
 
-const pad2 = n => {
+const pad2 = (n: number) => {
   const s = "" + n;
   return (s.length < 2) ? (" " + s) : s;
 };
@@ -37,10 +37,10 @@ class EmptyCell implements ICell {
 }
 
 class ValueCell implements ICell {
-  values: {}[];
+  values: number[];
 
   constructor(values) {
-    this.values = Array.from(new Set(values));
+    this.values = <number[]>Array.from(new Set(values));
   }
 
   toString() {
@@ -185,7 +185,7 @@ class AcrossCell implements ICell {
 
 const drawRow = row => row.map(v => v.draw()).join("") + "\n";
 
-const drawGrid = grid => grid.map(drawRow).join("");
+const drawGrid = (grid: ICell[][]) => grid.map(drawRow).join("");
 
 
 // need to use function() to get the arguments list provided
@@ -214,7 +214,7 @@ const concatLists = (coll1, coll2) => coll1.concat(coll2);
 
 const allDifferent = arr => arr.length === new Set(arr).size;
 
-const permute = (vs, target, soFar) => {
+const permute = (vs: ValueCell[], target: number, soFar: number[]): number[][]  => {
   if (target >= 1) {
     if (soFar.length === (vs.length - 1)) {
       return [conj(soFar, target)];
@@ -229,13 +229,15 @@ const permute = (vs, target, soFar) => {
   }
 };
 
-const permuteAll = (vs, target) => permute(vs, target, []);
+const permuteAll = (vs: ValueCell[], target: number) => permute(vs, target, []);
 
 const isPossible = (v, n) => v.values.includes(n);
 
 const range = n => new Array(n).fill(0).map((x, i) => i);
 
-const transpose = m => (0 === m.length) ? [] : range(m[0].length).map(i => m.map(col => col[i]));
+function transpose<T>(m: T[][]): T[][] {
+  return (0 === m.length) ? [] : range(m[0].length).map(i => m.map(col => col[i]));
+}
 
 const takeWhile = (f, coll) => {
   let result = [];
@@ -256,7 +258,7 @@ const drop = (n, coll) => {
 
 const take = (n, coll) => coll.slice(0, n);
 
-const partitionBy = (f, coll) => {
+function partitionBy<T>(f, coll: T[]): T[][] {
   if (0 === coll.length) {
     return [];
   }
@@ -266,22 +268,22 @@ const partitionBy = (f, coll) => {
     const group = takeWhile(y => fx === f(y), coll);
     return concatLists([group], partitionBy(f, drop(group.length, coll)));
   }
-};
+}
 
-const partitionAll = (n, step, coll) => {
+function partitionAll<T>(n: number, step: number, coll: T[]): T[][] {
   if (0 === coll.length) {
     return [];
   }
   else {
     return concatLists([take(n, coll)], partitionAll(n, step, drop(step, coll)));
   }
-};
+}
 
 const partitionN = (n, coll) => partitionAll(n, n, coll);
 
 const last = coll => coll[coll.length - 1];
 
-const solveStep = (cells, total) => {
+const solveStep = (cells: ValueCell[], total: number) => {
   let finalIndex = cells.length - 1;
   let perms = permuteAll(cells, total)
     .filter(vals => isPossible(last(cells), vals[finalIndex]))
@@ -307,20 +309,19 @@ const solvePair = (f, pair) => {
   }
 };
 
-const solveLine = (line, f) => flatten(pairTargetsWithValues(line).map(pair => solvePair(f, pair)));
+const solveLine = (line, f): ICell[] => flatten(pairTargetsWithValues(line).map(pair => solvePair(f, pair)));
 
 const solveRow = row => solveLine(row, x => x.getAcross());
 
 const solveColumn = column => solveLine(column, x => x.getDown());
 
-const solveGrid = grid => {
+function solveGrid(grid: ICell[][]): ICell[][] {
   const rowsDone = grid.map(solveRow);
-  const colsDone = transpose(rowsDone)
-    .map(solveColumn);
+  const colsDone = transpose(rowsDone).map(solveColumn);
   return transpose(colsDone);
-};
+}
 
-const gridEquals = (g1, g2) => {
+const gridEquals = (g1: ICell[][], g2: ICell[][]) => {
   if (g1.length == g2.length) {
     for (let i = 0; i < g1.length; ++i) {
       for (let j = 0; j < g1[i].length; ++j) {
@@ -336,7 +337,7 @@ const gridEquals = (g1, g2) => {
   }
 };
 
-const solver = grid => {
+function solver(grid: ICell[][]): ICell[][] {
   console.log(drawGrid(grid));
   const g = solveGrid(grid);
   if (gridEquals(g, grid)) {
@@ -345,5 +346,5 @@ const solver = grid => {
   else {
     return solver(g);
   }
-};
+}
 
